@@ -25,7 +25,7 @@ public:
 public:
     vector<vector<int>> gameMapVec; //存储棋盘和棋子情况，空白为0，白1，黑-1
     vector<vector<int>> scoreMapVec;    //存储各点位评分
-    boll playerFlag; //标志下棋方
+    bool playerFlag; //标志下棋方（己方为1，对方为0）
     GameType gameType; //游戏类型
     GameStatus gameStatus; //游戏状态
 
