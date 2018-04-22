@@ -1,12 +1,8 @@
 #include "gamemodel.h"
 
-GameModel::GameModel()
-{
-
-}
 
 //游戏开始，，初始化棋盘格和评分表
-void GameModel :: startGame(GameType type){
+void GameModel::startGame(GameType type){
     gameType = type;
 
     //清空棋盘
@@ -35,7 +31,7 @@ void GameModel :: startGame(GameType type){
 }
 
 //判断输赢
-bool GameModel :: isWin(int row, int col){
+bool GameModel::isWin(int row, int col){
     //水平方向
     for(int i = 0; i < 5; i++){
         if(col - i > 0 &&
@@ -88,7 +84,7 @@ bool GameModel :: isWin(int row, int col){
 }
 
 //判断死棋
-bool GameModel :: isDead(){
+bool GameModel::isDead(){
     for(int i = 0; i < BoardSize; i++){
         for(int j = 0; j < BoardSize; j++)
             if(gameMapVec[i][j] == 0)
@@ -97,6 +93,12 @@ bool GameModel :: isDead(){
     return true;
 }
 
+void GameModel::calculateScore(){
 
+}
+
+void GameModel::actionByBot(int &clickRow, int &clickCol){
+
+}
 
 

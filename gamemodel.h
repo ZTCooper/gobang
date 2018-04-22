@@ -21,7 +21,8 @@ const int BoardSize = 15;   //棋盘尺寸
 class GameModel
 {
 public:
-    GameModel();
+    GameModel(){}
+    ~GameModel(){}
 public:
     vector<vector<int>> gameMapVec; //存储棋盘和棋子情况，空白为0，白1，黑-1
     vector<vector<int>> scoreMapVec;    //存储各点位评分
