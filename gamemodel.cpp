@@ -87,6 +87,15 @@ bool GameModel :: isWin(int row, int col){
     return false;
 }
 
+//判断死棋
+bool GameModel :: isDead(){
+    for(int i = 0; i < BoardSize; i++){
+        for(int j = 0; j < BoardSize; j++)
+            if(gameMapVec[i][j] == 0)
+                return false;
+    }
+    return true;
+}
 
 
 
