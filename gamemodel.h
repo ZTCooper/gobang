@@ -16,7 +16,7 @@ enum GameStatus{
     DEAD        //死棋
 };
 
-const int BoardSize = 15;   //棋盘尺寸
+const int BoardSize = 14;   //棋盘尺寸
 
 class GameModel
 {

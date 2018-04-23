@@ -4,16 +4,12 @@
 #include <QMainWindow>
 #include <gamemodel.h>
 
-namespace Ui {
-class MainWindow;
-}
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
 protected:
@@ -25,7 +21,6 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
 
 private:
-    Ui::MainWindow *ui;
     GameModel *game;    //游戏指针
     GameType game_type;     //存储游戏类型
     int clickRow, clickCol;   //存储点击位置（行，列）
@@ -37,7 +32,6 @@ private slots:  //信号槽
     void chessOneByBot();   //机器下棋
     void initPVPGame();     //初始化人对人
     void initPVBGame();     //初始化人机
-
 };
 
 #endif // MAINWINDOW_H

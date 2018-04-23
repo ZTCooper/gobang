@@ -1,16 +1,20 @@
+#include <QPainter>
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+const int BoardMargin = 30; // 棋盘边缘空隙
+const int BlockSize = 40; // 格子的大小
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
 {
-    ui->setupUi(this);
+    //设置棋盘大小
+    setFixedSize(BoardMargin * 2 + BlockSize * BoardSize, BoardMargin * 2 + BlockSize * BoardSize);
+    setStyleSheet("background-color:rgb(217,171,130);");
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+
 }
 
 void MainWindow::initGame(){
@@ -48,6 +52,18 @@ void MainWindow::chessOneByBot(){
 
 }
 
+//绘图
 void MainWindow::paintEvent(QPaintEvent *event){
+    QPainter painter(this);
+    //绘制棋盘
+    painter.setRenderHint(QPainter::Antialiasing, true);    //抗锯齿
 
+    for(int i = 0; i <= BoardSize; i++){
+        painter.drawLine(BoardMargin + BlockSize * i, BoardMargin, BoardMargin + BlockSize * i, size().height() - BoardMargin);
+        painter.drawLine(BoardMargin, BoardMargin + BlockSize * i, size().width() - BoardMargin, BoardMargin + BlockSize * i);
+
+        QBrush brush;
+        brush.setStyle(Qt::SolidPattern);
+    }
 }
+
