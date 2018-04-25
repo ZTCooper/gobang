@@ -3,6 +3,7 @@
 
 const int BoardMargin = 30; // 棋盘边缘空隙
 const int BlockSize = 40; // 格子的大小
+const int Padding = 20; // 棋盘boarder到坐标距离
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -65,5 +66,16 @@ void MainWindow::paintEvent(QPaintEvent *event){
         QBrush brush;
         brush.setStyle(Qt::SolidPattern);
     }
+    //设置字体
+    QFont font;
+    font.setPointSize(8);
+    font.setBold(true);
+    painter.setFont(font);
+    //绘制坐标
+    for(int i = 0; i <= BoardSize; i++){
+        painter.drawText(QPoint(BoardMargin + BlockSize * i - font.pointSize()/2, Padding), QString(QString::number(i + 1)));
+        painter.drawText(QPoint(Padding - font.pointSize(), BoardMargin + BlockSize * i + font.pointSize()/2), QString(QString::number(i + 1)));
+    }
+
 }
 
