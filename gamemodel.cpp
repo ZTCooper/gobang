@@ -16,7 +16,7 @@ void GameModel::startGame(GameType type){
     }
 
     //人机模式需清空并初始化评分vec
-    if(gameType == BOT){
+    if(gameType == PVB){
         scoreMapVec.clear();
         for(int i = 0; i < BoardSize; i++){
             vector<int> lineBoard;

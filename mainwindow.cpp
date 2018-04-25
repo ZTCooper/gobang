@@ -1,4 +1,6 @@
 #include <QPainter>
+#include<QMenuBar>
+#include<QMenu>
 #include "mainwindow.h"
 
 const int BoardMargin = 30; // 棋盘边缘空隙
@@ -8,14 +10,33 @@ const int Padding = 20; // 棋盘boarder到坐标距离
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    //设置棋盘大小
+    //设置棋盘大小 背景色
     setFixedSize(BoardMargin * 2 + BlockSize * BoardSize, BoardMargin * 2 + BlockSize * BoardSize);
     setStyleSheet("background-color:rgb(217,171,130);");
+    //开启鼠标hover功能
+    setMouseTracking(true);
+
+    //添加菜单
+    QMenu *gameMenu = menuBar()->addMenu(tr("Game"));   //menuBar默认存在
+
+    QAction *actionPVP = new QAction("Person VS Person", this);
+    connect(actionPVP, SIGNAL(triggered()), this, SLOT(initPVPGame()));
+    gameMenu->addAction(actionPVP);
+
+    QAction *actionPVB = new QAction("Person VS Computer", this);
+    connect(actionPVB, SIGNAL(triggered()), this, SLOT(initPVBGame()));
+    gameMenu->addAction(actionPVB);
+
+    //开始游戏
+    initGame();
 }
 
 MainWindow::~MainWindow()
 {
-
+    if(game){
+        delete game;
+        game = nullptr;
+    }
 }
 
 void MainWindow::initGame(){
@@ -24,14 +45,14 @@ void MainWindow::initGame(){
 }
 
 void MainWindow::initPVPGame(){
-    game_type = P2P;
+    game_type = PVP;
     game->gameStatus = PLAYING;
     game->startGame(game_type);
     update();
 }
 
 void MainWindow::initPVBGame(){
-    game_type = BOT;
+    game_type = PVB;
     game->gameStatus = PLAYING;
     game->startGame(game_type);
     update();
@@ -72,9 +93,10 @@ void MainWindow::paintEvent(QPaintEvent *event){
     font.setBold(true);
     painter.setFont(font);
     //绘制坐标
+    vector<QString> xLabel {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"};
     for(int i = 0; i <= BoardSize; i++){
-        painter.drawText(QPoint(BoardMargin + BlockSize * i - font.pointSize()/2, Padding), QString(QString::number(i + 1)));
-        painter.drawText(QPoint(Padding - font.pointSize(), BoardMargin + BlockSize * i + font.pointSize()/2), QString(QString::number(i + 1)));
+        painter.drawText(QPoint(BoardMargin + BlockSize * i - font.pointSize()/2, BoardMargin + BlockSize * BoardSize + Padding), QString(xLabel[i]));
+        painter.drawText(QPoint(Padding - font.pointSize(), BoardMargin + BlockSize * (BoardSize - i) + font.pointSize()/2), QString(QString::number(i + 1)));
     }
 
 }

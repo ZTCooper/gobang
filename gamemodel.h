@@ -5,8 +5,8 @@ using namespace std;
 
 //游戏类型
 enum GameType{
-    P2P,    //双人
-    BOT     //人机
+    PVP,    //双人
+    PVB     //人机
 };
 
 //游戏状态
