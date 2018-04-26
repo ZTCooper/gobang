@@ -32,7 +32,7 @@ public:
 
     void startGame(GameType type); //游戏开始
     void calculateScore(); //计算评分
-    void actionByPerson(int rou, int col); //人下棋
+    void actionByPerson(int row, int col); //人下棋
     void actionByBot(int &clickRow, int &clickCol); //机器下棋
     void updateGameMap(int row, int col); //落子后更新棋盘
     bool isWin(int row, int col); //判断胜利

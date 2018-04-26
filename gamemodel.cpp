@@ -30,6 +30,20 @@ void GameModel::startGame(GameType type){
     playerFlag = true;
 }
 
+void GameModel::updateGameMap(int row, int col){
+    if(playerFlag)
+        gameMapVec[row][col] = 1;
+    else
+        gameMapVec[row][col] = -1;
+
+    // 交换棋权
+    playerFlag = !playerFlag;
+}
+
+void GameModel::actionByPerson(int row, int col){
+    updateGameMap(row, col);
+}
+
 //判断输赢
 bool GameModel::isWin(int row, int col){
     //水平方向
