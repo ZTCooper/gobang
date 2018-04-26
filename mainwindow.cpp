@@ -186,5 +186,21 @@ void MainWindow::paintEvent(QPaintEvent *event){
         painter.setBrush(brush);
         painter.drawRect(BoardMargin + BlockSize * clickCol - MarkSize/2, BoardMargin + BlockSize * clickRow - MarkSize/2, MarkSize, MarkSize);
     }
+
+    // 绘制棋子
+    for(int i = 0; i < BoardSize; i++){
+        for(int j = 0; j < BoardSize; j++){
+            if(game->gameMapVec[i][j] == 1){    // 己方
+                brush.setColor(Qt::white);      // 白色
+                painter.setBrush(brush);
+                painter.drawEllipse(QPoint(BoardMargin + j * BlockSize, BoardMargin + i * BlockSize), Radius, Radius);
+            }
+            if(game->gameMapVec[i][j] == -1){    // 对方
+                brush.setColor(Qt::black);      // 黑色
+                painter.setBrush(brush);
+                painter.drawEllipse(QPoint(BoardMargin + j * BlockSize, BoardMargin + i * BlockSize), Radius, Radius);
+            }
+        }
+    }
 }
 
