@@ -4,6 +4,9 @@
 #include<QMouseEvent>
 #include<QTimer>
 #include "mainwindow.h"
+#include<iostream>
+
+using namespace std;
 
 const int BoardMargin = 30; // 棋盘边缘空隙
 const int BlockSize = 40; // 格子的大小
@@ -66,8 +69,9 @@ void MainWindow::initPVBGame(){
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event){
     // 鼠标hover确定落子点
-    int x = event->globalX();
-    int y = event->globalY();
+    int x = event->x();
+    int y = event->y();
+    //cout << x << " " << y << endl;
     // 判断位置在棋盘格内
     if(x >= BoardMargin &&
             x < size().width() - BoardMargin &&
@@ -75,8 +79,9 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event){
             y < size().height() - BoardMargin)
     {
         // 行 列
-        int col = (x - BoardMargin) / BoardSize;
-        int row = (y - BoardMargin) / BoardSize;
+        int col = (x - BoardMargin) / BlockSize;
+        int row = (y - BoardMargin) / BlockSize;
+        //cout << row << " " << col << " " << endl;
         // 找点击点的左上角点坐标
         int leftTopPosX = BoardMargin + col * BlockSize;
         int leftTopPosY = BoardMargin + row * BlockSize;
@@ -88,7 +93,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event){
         int rightTopPosY = leftTopPosY;
         // 右下
         int rightDownPosX = rightTopPosX;
-        int rightDownPosY = rightTopPosY;
+        int rightDownPosY = rightTopPosY + BlockSize;
 
         // 初始化，计算点击点与四周点的距离
         clickRow = -1;
@@ -115,6 +120,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event){
             clickRow = row + 1;
             clickCol = col + 1;
         }// 右下
+        //cout << clickRow << " " << clickCol << endl;
     }
 
     update();
