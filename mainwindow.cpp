@@ -3,6 +3,8 @@
 #include<QMenu>
 #include<QMouseEvent>
 #include<QTimer>
+#include<QDebug>
+#include<QMessageBox>
 #include "mainwindow.h"
 #include<iostream>
 
@@ -71,7 +73,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event){
     // 鼠标hover确定落子点
     int x = event->x();
     int y = event->y();
-    //cout << x << " " << y << endl;
+    //qDebug("%d %d", x, y);
     // 判断位置在棋盘格内
     if(x >= BoardMargin &&
             x < size().width() - BoardMargin &&
@@ -81,7 +83,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event){
         // 行 列
         int col = (x - BoardMargin) / BlockSize;
         int row = (y - BoardMargin) / BlockSize;
-        //cout << row << " " << col << " " << endl;
+        //qDebug("%d %d", row, col);
         // 找点击点的左上角点坐标
         int leftTopPosX = BoardMargin + col * BlockSize;
         int leftTopPosY = BoardMargin + row * BlockSize;
@@ -120,7 +122,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event){
             clickRow = row + 1;
             clickCol = col + 1;
         }// 右下
-        //cout << clickRow << " " << clickCol << endl;
+        //qDebug("%d %d", clickRow, clickCol);
     }
 
     update();
@@ -199,6 +201,30 @@ void MainWindow::paintEvent(QPaintEvent *event){
                 brush.setColor(Qt::black);      // 黑色
                 painter.setBrush(brush);
                 painter.drawEllipse(QPoint(BoardMargin + j * BlockSize, BoardMargin + i * BlockSize), Radius, Radius);
+            }
+        }
+    }
+
+    // 判断输赢
+    if(clickRow > 0 && clickRow < BoardSize &&
+       clickCol > 0 && clickRow < BoardSize &&(
+       game->gameMapVec[clickRow][clickCol] == 1 ||
+       game->gameMapVec[clickRow][clickCol] == -1))
+    {
+        if(game->isWin(clickRow, clickCol) && game->gameStatus == PLAYING){
+            qDebug("win");
+            game->gameStatus = WIN;
+            QString winner;
+            if(game->gameMapVec[clickRow][clickCol] == 1)
+                winner = "White wins!";
+            else if(game->gameMapVec[clickRow][clickCol] == -1)
+                winner = "Black wins!";
+            QMessageBox::StandardButton button_value = QMessageBox::information(this, "congratulations", winner);
+
+            // 按钮显示成功重新开始游戏，避免死循环
+            if(button_value == QMessageBox::Ok){
+                game->startGame(game_type);
+                game->gameStatus = PLAYING;
             }
         }
     }
