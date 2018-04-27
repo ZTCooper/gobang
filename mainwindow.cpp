@@ -5,10 +5,10 @@
 #include<QTimer>
 #include<QDebug>
 #include<QMessageBox>
+#include<QApplication>
+#include<QPixmap>
 #include "mainwindow.h"
-#include<iostream>
 
-using namespace std;
 
 const int BoardMargin = 30; // 棋盘边缘空隙
 const int BlockSize = 40; // 格子的大小
@@ -154,6 +154,7 @@ void MainWindow::chessOneByBot(){
 //绘图
 void MainWindow::paintEvent(QPaintEvent *event){
     QPainter painter(this);
+
     //绘制棋盘
     painter.setRenderHint(QPainter::Antialiasing, true);    //抗锯齿
 
@@ -167,6 +168,7 @@ void MainWindow::paintEvent(QPaintEvent *event){
     font.setPointSize(8);
     font.setBold(true);
     painter.setFont(font);
+
     //绘制坐标
     vector<QString> xLabel {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O"};
     for(int i = 0; i <= BoardSize; i++){
@@ -214,17 +216,23 @@ void MainWindow::paintEvent(QPaintEvent *event){
         if(game->isWin(clickRow, clickCol) && game->gameStatus == PLAYING){
             qDebug("win");
             game->gameStatus = WIN;
+
             QString winner;
+
             if(game->gameMapVec[clickRow][clickCol] == 1)
                 winner = "White wins!";
             else if(game->gameMapVec[clickRow][clickCol] == -1)
                 winner = "Black wins!";
-            QMessageBox::StandardButton button_value = QMessageBox::information(this, "congratulations", winner);
 
-            // 按钮显示成功重新开始游戏，避免死循环
-            if(button_value == QMessageBox::Ok){
+            int answer = QMessageBox::question(NULL, "congratulations", winner + "\nWanna play again?", QMessageBox::Yes, QMessageBox::No);
+
+            // 点击Yes重新开始游戏
+            if(answer == QMessageBox::Yes){
                 game->startGame(game_type);
                 game->gameStatus = PLAYING;
+            }
+            else if(answer == QMessageBox::No){
+                QApplication::quit();
             }
         }
     }
