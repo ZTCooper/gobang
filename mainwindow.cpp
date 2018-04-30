@@ -7,6 +7,8 @@
 #include<QMessageBox>
 #include<QApplication>
 #include<QPixmap>
+#include<QPushButton>
+#include<QLabel>
 #include "mainwindow.h"
 
 
@@ -22,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     //设置棋盘大小 背景色
-    setFixedSize(BoardMargin * 2 + BlockSize * BoardSize, BoardMargin * 2 + BlockSize * BoardSize);
+    setFixedSize(BoardMargin * 2 + BlockSize * BoardSize + 200, BoardMargin * 2 + BlockSize * BoardSize);
     setStyleSheet("background-color:rgb(217,171,130);");
     //开启鼠标hover功能
     setMouseTracking(true);
@@ -37,6 +39,24 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *actionPVB = new QAction("Person VS Computer", this);
     connect(actionPVB, SIGNAL(triggered()), this, SLOT(initPVBGame()));
     gameMenu->addAction(actionPVB);
+
+    QFont font;
+    font.setPointSize(12);
+    font.setBold(true);
+
+    QPushButton *pvpButton = new QPushButton("重新开始", this);
+    pvpButton->setGeometry(size().width() - 150, size().height() - 200, 100, 50);
+    pvpButton->setFont(font);
+    connect(pvpButton, SIGNAL(clicked(bool)), this, SLOT(initPVPGame()));
+
+    QPushButton *exitButton = new QPushButton("退出游戏", this);
+    exitButton->setGeometry(size().width() - 150, size().height() - 100, 100, 50);
+    exitButton->setFont(font);
+    connect(exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(showTimeLimit()));
+    timer->start(1000);
 
     //开始游戏
     initGame();
@@ -68,6 +88,16 @@ void MainWindow::initPVBGame(){
     game->startGame(game_type);
     update();
 }
+/*
+void MainWindow::showTimeLimit(){
+    QLabel *timeLabel = new QLabel();
+    timeLabel->setGeometry(size().width() - 150, size().height() - 300, 100, 50);
+    for(int i = 30; i >= 0; i--){
+        timeLabel->setText(QString::number(i));
+    }
+    timeLabel->show();
+}
+*/
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event){
     // 鼠标hover确定落子点
@@ -159,8 +189,8 @@ void MainWindow::paintEvent(QPaintEvent *event){
     painter.setRenderHint(QPainter::Antialiasing, true);    //抗锯齿
 
     for(int i = 0; i <= BoardSize; i++){
-        painter.drawLine(BoardMargin + BlockSize * i, BoardMargin, BoardMargin + BlockSize * i, size().height() - BoardMargin);
-        painter.drawLine(BoardMargin, BoardMargin + BlockSize * i, size().width() - BoardMargin, BoardMargin + BlockSize * i);
+        painter.drawLine(QPoint(BoardMargin, BoardMargin + BlockSize * i), QPoint(BoardMargin + BoardSize * BlockSize, BoardMargin + BlockSize * i));
+        painter.drawLine(QPoint(BoardMargin + BlockSize * i, BoardMargin), QPoint(BoardMargin + BlockSize * i, BoardMargin + BoardSize * BlockSize));
     }
 
     //设置字体
@@ -179,12 +209,14 @@ void MainWindow::paintEvent(QPaintEvent *event){
     // 绘制落子标记方框
     QBrush brush;
     brush.setStyle(Qt::SolidPattern);
+
+    //qDebug("%d %d", clickRow, clickCol);
     if(clickRow > 0 && clickRow < BoardSize &&
        clickCol > 0 && clickCol < BoardSize &&
        game->gameMapVec[clickRow][clickCol] == 0)   //判断在棋盘格范围内且该点无棋子
     {
         if(game->playerFlag)    // 己方
-           brush.setColor(Qt::white);
+            brush.setColor(Qt::white);
         else
             brush.setColor(Qt::black);
         painter.setBrush(brush);

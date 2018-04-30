@@ -32,6 +32,7 @@ private slots:  //信号槽
     void chessOneByBot();   //机器下棋
     void initPVPGame();     //初始化人对人
     void initPVBGame();     //初始化人机
+    //void showTimeLimit();   //显示倒计时
 };
 
 #endif // MAINWINDOW_H
