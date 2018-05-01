@@ -43,18 +43,26 @@ MainWindow::MainWindow(QWidget *parent)
     connect(actionPVB, SIGNAL(triggered()), this, SLOT(initPVBGame()));
     gameMenu->addAction(actionPVB);
 
-    QFont font;
-    font.setPointSize(12);
-    font.setBold(true);
+    QFont labelFont;
+    labelFont.setPointSize(20);
+    labelFont.setBold(true);
+    // 执棋方
+    QLabel *chessLabel = new QLabel("执棋方：", this);
+    chessLabel->setFont(labelFont);
+    chessLabel->setGeometry(size().width() - 175, 100, 200, 50);
+
+    QFont buttonFont;
+    buttonFont.setPointSize(12);
+    buttonFont.setBold(true);
 
     QPushButton *pvpButton = new QPushButton("重新开始", this);
     pvpButton->setGeometry(size().width() - 150, size().height() - 200, 100, 50);
-    pvpButton->setFont(font);
+    pvpButton->setFont(buttonFont);
     connect(pvpButton, SIGNAL(clicked(bool)), this, SLOT(initPVPGame()));
 
     QPushButton *exitButton = new QPushButton("退出游戏", this);
     exitButton->setGeometry(size().width() - 150, size().height() - 100, 100, 50);
-    exitButton->setFont(font);
+    exitButton->setFont(buttonFont);
     connect(exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
 
     //开始游戏
@@ -257,6 +265,14 @@ void MainWindow::paintEvent(QPaintEvent *event){
             }
         }
     }
+
+    // 绘制执棋方棋子
+    if(game->playerFlag)
+        brush.setColor(Qt::white);
+    else
+        brush.setColor(Qt::black);
+    painter.setBrush(brush);
+    painter.drawEllipse(QPoint(size().width() - 100, 200), 2 * Radius, 2 * Radius);
 
     // 判断输赢
     if(clickRow > 0 && clickRow < BoardSize &&
