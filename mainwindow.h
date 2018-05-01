@@ -26,13 +26,14 @@ private:
     int clickRow, clickCol;   //存储点击位置（行，列）
     void initGame();    //初始化
     void checkGame(int y, int x);
+    void createTimer();
 
 private slots:  //信号槽
     void chessOneByPerson();    //人下棋
     void chessOneByBot();   //机器下棋
     void initPVPGame();     //初始化人对人
     void initPVBGame();     //初始化人机
-    //void showTimeLimit();   //显示倒计时
+    void showTimeLimit();   //显示倒计时
 };
 
 #endif // MAINWINDOW_H

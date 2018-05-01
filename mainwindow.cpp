@@ -9,6 +9,7 @@
 #include<QPixmap>
 #include<QPushButton>
 #include<QLabel>
+#include<QPalette>
 #include "mainwindow.h"
 
 
@@ -18,6 +19,8 @@ const int Padding = 10; // 棋盘border到坐标距离
 const int PosEps = BlockSize/2; // 鼠标点击落子的模糊距离
 const int MarkSize = 6; // 落子时标记边长
 const int Radius = 15; // 棋子半径
+const int countdown = 10;   //倒计时
+int t = countdown;
 const int Delay = 700;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -54,10 +57,6 @@ MainWindow::MainWindow(QWidget *parent)
     exitButton->setFont(font);
     connect(exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(showTimeLimit()));
-    timer->start(1000);
-
     //开始游戏
     initGame();
 }
@@ -79,6 +78,7 @@ void MainWindow::initPVPGame(){
     game_type = PVP;
     game->gameStatus = PLAYING;
     game->startGame(game_type);
+    createTimer();
     update();
 }
 
@@ -88,16 +88,35 @@ void MainWindow::initPVBGame(){
     game->startGame(game_type);
     update();
 }
-/*
+
+void MainWindow::createTimer(){
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(showTimeLimit()));
+    timer->start(1000);
+}
+
 void MainWindow::showTimeLimit(){
-    QLabel *timeLabel = new QLabel();
-    timeLabel->setGeometry(size().width() - 150, size().height() - 300, 100, 50);
-    for(int i = 30; i >= 0; i--){
-        timeLabel->setText(QString::number(i));
+    QFont font;
+    font.setPointSize(30);
+    font.setBold(true);
+    QPalette pe;
+    pe.setColor(QPalette::WindowText, Qt::red);
+
+    QLabel *timeLabel = new QLabel(this);
+    timeLabel->setGeometry(size().width() - 115, size().height() - 300, 100, 50);
+    timeLabel->setFont(font);
+    timeLabel->setPalette(pe);
+    if(t > 0){
+        timeLabel->setText(QString::number(t));
+        t--;
+    }
+    else if(t == 0){
+        timeLabel->setText(QString::number(t));
+        game->playerFlag = !game->playerFlag;
+        t = countdown;
     }
     timeLabel->show();
 }
-*/
 
 void MainWindow::mouseMoveEvent(QMouseEvent *event){
     // 鼠标hover确定落子点
@@ -170,7 +189,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event){
 void MainWindow::chessOneByPerson(){
     if(clickRow != -1 && clickCol != -1 && game->gameMapVec[clickRow][clickCol] == 0){
         game->actionByPerson(clickRow, clickCol);
-
+        t = countdown;
         update();
     }
 }
@@ -247,6 +266,7 @@ void MainWindow::paintEvent(QPaintEvent *event){
     {
         if(game->isWin(clickRow, clickCol) && game->gameStatus == PLAYING){
             qDebug("win");
+            t = -1;     //计时器停止
             game->gameStatus = WIN;
 
             QString winner;
