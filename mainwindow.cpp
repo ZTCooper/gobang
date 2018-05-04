@@ -21,6 +21,7 @@ const int MarkSize = 6; // 落子时标记边长
 const int Radius = 15; // 棋子半径
 const int countdown = 10;   //倒计时
 int t = countdown;
+bool timerFlag = 0;   //是否已有Timer
 const int Delay = 700;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -33,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent)
     setMouseTracking(true);
 
     //添加菜单
+    /*
     QMenu *gameMenu = menuBar()->addMenu(tr("Game"));   //menuBar默认存在
 
     QAction *actionPVP = new QAction("Person VS Person", this);
@@ -42,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     QAction *actionPVB = new QAction("Person VS Computer", this);
     connect(actionPVB, SIGNAL(triggered()), this, SLOT(initPVBGame()));
     gameMenu->addAction(actionPVB);
+    */
 
     QFont labelFont;
     labelFont.setPointSize(20);
@@ -86,7 +89,9 @@ void MainWindow::initPVPGame(){
     game_type = PVP;
     game->gameStatus = PLAYING;
     game->startGame(game_type);
-    createTimer();
+    t = countdown;      // 计时器重置时间
+    if (!timerFlag)     // 避免重复创建timer
+        createTimer();
     update();
 }
 
@@ -101,6 +106,7 @@ void MainWindow::createTimer(){
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(showTimeLimit()));
     timer->start(1000);
+    timerFlag = 1;      // 已创建timer
 }
 
 void MainWindow::showTimeLimit(){
