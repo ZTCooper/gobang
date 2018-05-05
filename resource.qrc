@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>sounds/chessone.wav</file>
+        <file>sounds/win.wav</file>
+    </qresource>
+</RCC>

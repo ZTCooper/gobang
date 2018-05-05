@@ -10,8 +10,11 @@
 #include<QPushButton>
 #include<QLabel>
 #include<QPalette>
+#include<QSound>
 #include "mainwindow.h"
 
+#define CHESS_ONE_SOUND ":/sounds/chessone.wav"
+#define WIN_SOUND ":/sounds/win.wav"
 
 const int BoardMargin = 30; // 棋盘边缘空隙
 const int BlockSize = 40; // 格子的大小
@@ -89,7 +92,7 @@ void MainWindow::initPVPGame(){
     game_type = PVP;
     game->gameStatus = PLAYING;
     game->startGame(game_type);
-    t = countdown;      // 计时器重置时间
+    t = -1;      // 第一次落子不需要计时
     if (!timerFlag)     // 避免重复创建timer
         createTimer();
     update();
@@ -193,6 +196,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent *event){
 
 void MainWindow::mouseReleaseEvent(QMouseEvent *event){
     if(!(game_type == PVB && !game->playerFlag)){
+        t = countdown;      // 每次落子后开始倒计时
         chessOneByPerson();
         if(game->gameType == PVB && !game->playerFlag){
             QTimer::singleShot(Delay, this, SLOT(chessOneByBot()));
@@ -203,6 +207,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event){
 void MainWindow::chessOneByPerson(){
     if(clickRow != -1 && clickCol != -1 && game->gameMapVec[clickRow][clickCol] == 0){
         game->actionByPerson(clickRow, clickCol);
+        QSound::play(CHESS_ONE_SOUND);
         t = countdown;
         update();
     }
@@ -290,6 +295,7 @@ void MainWindow::paintEvent(QPaintEvent *event){
             qDebug("win");
             t = -1;     //计时器停止
             game->gameStatus = WIN;
+            QSound::play(WIN_SOUND);
 
             QString winner;
 

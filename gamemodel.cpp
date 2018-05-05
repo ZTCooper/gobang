@@ -25,7 +25,6 @@ void GameModel::startGame(GameType type){
             scoreMapVec.push_back(lineBoard);
         }
     }
-
     //己方为1，对方为0
     playerFlag = true;
 }
