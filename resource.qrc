@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>sounds/chessone.wav</file>
         <file>sounds/win.wav</file>
+		<file>sounds/occupied.wav</file>
     </qresource>
 </RCC>

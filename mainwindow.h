@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QPushButton>
 #include <gamemodel.h>
 
 class MainWindow : public QMainWindow
@@ -28,12 +29,18 @@ private:
     void checkGame(int y, int x);
     void createTimer();
 
+    QPushButton *startButton;
+    QPushButton *restartButton;
+    QPushButton *exitButton;
+
 private slots:  //信号槽
     void chessOneByPerson();    //人下棋
     void chessOneByBot();   //机器下棋
     void initPVPGame();     //初始化人对人
     void initPVBGame();     //初始化人机
     void showTimeLimit();   //显示倒计时
+    void exitGame();    //询问是否退出
+    void showRandom();
 };
 
 #endif // MAINWINDOW_H

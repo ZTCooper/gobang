@@ -1,20 +1,21 @@
 #include <QPainter>
-#include<QMenuBar>
-#include<QMenu>
-#include<QMouseEvent>
-#include<QTimer>
-#include<QDebug>
-#include<QMessageBox>
-#include<QApplication>
-#include<QPixmap>
-#include<QPushButton>
-#include<QLabel>
-#include<QPalette>
-#include<QSound>
+#include <QMenuBar>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QTimer>
+#include <QDebug>
+#include <QMessageBox>
+#include <QApplication>
+#include <QPixmap>
+#include <QPushButton>
+#include <QLabel>
+#include <QPalette>
+#include <QSound>
 #include "mainwindow.h"
 
 #define CHESS_ONE_SOUND ":/sounds/chessone.wav"
 #define WIN_SOUND ":/sounds/win.wav"
+#define OCCUPIED_SOUND ":/sounds/occupied.wav"
 
 const int BoardMargin = 30; // 棋盘边缘空隙
 const int BlockSize = 40; // 格子的大小
@@ -22,7 +23,7 @@ const int Padding = 10; // 棋盘border到坐标距离
 const int PosEps = BlockSize/2; // 鼠标点击落子的模糊距离
 const int MarkSize = 6; // 落子时标记边长
 const int Radius = 15; // 棋子半径
-const int countdown = 10;   //倒计时
+const int countdown = 30;   //倒计时
 int t = countdown;
 bool timerFlag = 0;   //是否已有Timer
 const int Delay = 700;
@@ -36,43 +37,35 @@ MainWindow::MainWindow(QWidget *parent)
     //开启鼠标hover功能
     setMouseTracking(true);
 
-    //添加菜单
-    /*
-    QMenu *gameMenu = menuBar()->addMenu(tr("Game"));   //menuBar默认存在
-
-    QAction *actionPVP = new QAction("Person VS Person", this);
-    connect(actionPVP, SIGNAL(triggered()), this, SLOT(initPVPGame()));
-    gameMenu->addAction(actionPVP);
-
-    QAction *actionPVB = new QAction("Person VS Computer", this);
-    connect(actionPVB, SIGNAL(triggered()), this, SLOT(initPVBGame()));
-    gameMenu->addAction(actionPVB);
-    */
-
     QFont labelFont;
     labelFont.setPointSize(20);
     labelFont.setBold(true);
+
+    QFont buttonFont;
+    buttonFont.setPointSize(12);
+    buttonFont.setBold(true);
     // 执棋方
     QLabel *chessLabel = new QLabel("执棋方：", this);
     chessLabel->setFont(labelFont);
     chessLabel->setGeometry(size().width() - 175, 100, 200, 50);
 
-    QFont buttonFont;
-    buttonFont.setPointSize(12);
-    buttonFont.setBold(true);
+    startButton = new QPushButton("双人对战", this);
+    startButton->setGeometry(size().width() - 150, size().height() - 200, 100, 45);
+    startButton->setFont(buttonFont);
+    connect(startButton, SIGNAL(clicked(bool)), this, SLOT(showRandom()));
 
-    QPushButton *pvpButton = new QPushButton("重新开始", this);
-    pvpButton->setGeometry(size().width() - 150, size().height() - 200, 100, 50);
-    pvpButton->setFont(buttonFont);
-    connect(pvpButton, SIGNAL(clicked(bool)), this, SLOT(initPVPGame()));
+    restartButton = new QPushButton("人机对战", this);
+    restartButton->setGeometry(size().width() - 150, size().height() - 150, 100, 45);
+    restartButton->setFont(buttonFont);
+    connect(restartButton, SIGNAL(clicked(bool)), this, SLOT(initPVBGame()));
 
-    QPushButton *exitButton = new QPushButton("退出游戏", this);
-    exitButton->setGeometry(size().width() - 150, size().height() - 100, 100, 50);
+    exitButton = new QPushButton("退出游戏", this);
+    exitButton->setGeometry(size().width() - 150, size().height() - 100, 100, 45);
     exitButton->setFont(buttonFont);
-    connect(exitButton, SIGNAL(clicked(bool)), this, SLOT(close()));
+    connect(exitButton, SIGNAL(clicked(bool)), this, SLOT(exitGame()));
 
     //开始游戏
-    initGame();
+    initPVPGame();
 }
 
 MainWindow::~MainWindow()
@@ -83,12 +76,33 @@ MainWindow::~MainWindow()
     }
 }
 
+
+void MainWindow::showRandom(){
+    int N = 1 + rand() % 6;
+    QFont numFont;
+    numFont.setPointSize(12);
+    numFont.setBold(true);
+    QString random_num = QString::number(N);
+    int answer = QMessageBox::warning(NULL,
+                                      QString::fromUtf8("奇数黑子先走，偶数白子先走"),
+                                      random_num,
+                                      QMessageBox::Ok);
+
+    if(answer == QMessageBox::Ok){
+        game->startGame(game_type);
+        game->gameStatus = PLAYING;
+        if(N % 2 == 0)  game->playerFlag = true;    // 偶数白子
+        else    game->playerFlag = false;   // 奇数黑子
+    }
+}
+/*
 void MainWindow::initGame(){
     game = new GameModel;
     initPVPGame();
-}
+}*/
 
 void MainWindow::initPVPGame(){
+    game = new GameModel;
     game_type = PVP;
     game->gameStatus = PLAYING;
     game->startGame(game_type);
@@ -99,6 +113,7 @@ void MainWindow::initPVPGame(){
 }
 
 void MainWindow::initPVBGame(){
+    game = new GameModel;
     game_type = PVB;
     game->gameStatus = PLAYING;
     game->startGame(game_type);
@@ -120,7 +135,7 @@ void MainWindow::showTimeLimit(){
     pe.setColor(QPalette::WindowText, Qt::red);
 
     QLabel *timeLabel = new QLabel(this);
-    timeLabel->setGeometry(size().width() - 115, size().height() - 300, 100, 50);
+    timeLabel->setGeometry(size().width() - 120, size().height() - 300, 100, 50);
     timeLabel->setFont(font);
     timeLabel->setPalette(pe);
     if(t > 0){
@@ -205,17 +220,21 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event){
 }
 
 void MainWindow::chessOneByPerson(){
-    if(clickRow != -1 && clickCol != -1 && game->gameMapVec[clickRow][clickCol] == 0){
-        game->actionByPerson(clickRow, clickCol);
-        QSound::play(CHESS_ONE_SOUND);
-        t = countdown;
-        update();
+    if(clickRow != -1 && clickCol != -1){
+        if(game->gameMapVec[clickRow][clickCol] == 0){
+            game->actionByPerson(clickRow, clickCol);
+            QSound::play(CHESS_ONE_SOUND);
+            t = countdown;
+            update();
+        }
+        else
+            QSound::play(OCCUPIED_SOUND);   // 该位置已有棋子，发出提示音
     }
 }
 
 void MainWindow::chessOneByBot(){
     game->actionByBot(clickRow, clickCol);
-
+    QSound::play(CHESS_ONE_SOUND);
     update();
 }
 
@@ -249,8 +268,8 @@ void MainWindow::paintEvent(QPaintEvent *event){
     brush.setStyle(Qt::SolidPattern);
 
     //qDebug("%d %d", clickRow, clickCol);
-    if(clickRow > 0 && clickRow < BoardSize &&
-       clickCol > 0 && clickCol < BoardSize &&
+    if(clickRow >= 0 && clickRow <= BoardSize &&
+       clickCol >= 0 && clickCol <= BoardSize &&
        game->gameMapVec[clickRow][clickCol] == 0)   //判断在棋盘格范围内且该点无棋子
     {
         if(game->playerFlag)    // 己方
@@ -304,7 +323,7 @@ void MainWindow::paintEvent(QPaintEvent *event){
             else if(game->gameMapVec[clickRow][clickCol] == -1)
                 winner = "Black wins!";
 
-            int answer = QMessageBox::question(NULL, "congratulations", winner + "\nWanna play again?", QMessageBox::Yes, QMessageBox::No);
+            int answer = QMessageBox::warning(NULL, "Congratulations", winner + "\nWanna play again?", QMessageBox::Yes, QMessageBox::No);
 
             // 点击Yes重新开始游戏
             if(answer == QMessageBox::Yes){
@@ -316,5 +335,15 @@ void MainWindow::paintEvent(QPaintEvent *event){
             }
         }
     }
+}
+
+void MainWindow::exitGame(){
+    t = -1;
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(
+                NULL, "Warning", QString::fromUtf8("确定退出吗？"),
+                QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    if(reply == QMessageBox::Yes) this->close();
+
 }
 
