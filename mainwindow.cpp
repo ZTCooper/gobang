@@ -78,21 +78,35 @@ MainWindow::~MainWindow()
 
 
 void MainWindow::showRandom(){
-    int N = 1 + rand() % 6;
+    int N1 = 1 + rand() % 9;
+    int N2 = 1 + rand() % 9;
+    while(N2 == N1){
+        N2 = 1 + rand() % 9;
+    }
     QFont numFont;
     numFont.setPointSize(12);
     numFont.setBold(true);
-    QString random_num = QString::number(N);
-    int answer = QMessageBox::warning(NULL,
-                                      QString::fromUtf8("奇数黑子先走，偶数白子先走"),
-                                      random_num,
-                                      QMessageBox::Ok);
+    QString random_num1 = QString::number(N1);
+    QString random_num2 = QString::number(N2);
+    int answer;
+    if(N1 < N2){
+        answer = QMessageBox::warning(NULL,
+                                          QString::fromUtf8("数字大的先走"),
+                                          random_num1 + '\n' + random_num2 + '\n' + "白子执棋！",
+                                          QMessageBox::Ok);
+    }
+    else{
+        answer = QMessageBox::warning(NULL,
+                                          QString::fromUtf8("数字大的先走"),
+                                          random_num1 + '\n' + random_num2 + '\n' + "黑子执棋！",
+                                          QMessageBox::Ok);
+    }
 
     if(answer == QMessageBox::Ok){
         game->startGame(game_type);
         game->gameStatus = PLAYING;
-        if(N % 2 == 0)  game->playerFlag = true;    // 偶数白子
-        else    game->playerFlag = false;   // 奇数黑子
+        if(N1 < N2)  game->playerFlag = true;    // 白子大，白子先走
+        else    game->playerFlag = false;   // 黑子大，黑子先走
     }
 }
 /*
