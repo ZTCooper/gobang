@@ -162,7 +162,7 @@ void GameModel::calculateScore()
         scoreMapVec.push_back(lineScores);
     }
 
-    // 计分（此处是完全遍历，其实可以用bfs或者dfs加减枝降低复杂度，通过调整权重值，调整AI智能程度以及攻守风格）
+    // 计分（此处是完全遍历，可以用bfs或者dfs加减枝降低复杂度，通过调整权重值，调整AI智能程度以及攻守风格）
     for (int row = 0; row < BoardSize; row++)
         for (int col = 0; col < BoardSize; col++)
         {

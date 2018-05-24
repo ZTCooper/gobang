@@ -27,11 +27,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    gamemodel.cpp
+    gamemodel.cpp \
+    dicewindow.cpp
 
 HEADERS += \
         mainwindow.h \
-    gamemodel.h
+    gamemodel.h \
+    dicewindow.h
 	
 RESOURCES += \
     resource.qrc

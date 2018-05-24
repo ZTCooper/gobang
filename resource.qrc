@@ -3,5 +3,11 @@
         <file>sounds/chessone.wav</file>
         <file>sounds/win.wav</file>
 		<file>sounds/occupied.wav</file>
+		<file>pics/dice-1.png</file>
+		<file>pics/dice-2.png</file>
+		<file>pics/dice-3.png</file>
+		<file>pics/dice-4.png</file>
+		<file>pics/dice-5.png</file>
+		<file>pics/dice-6.png</file>
     </qresource>
 </RCC>

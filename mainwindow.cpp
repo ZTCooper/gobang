@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QPalette>
 #include <QSound>
+#include "dicewindow.h"
 #include "mainwindow.h"
 
 #define CHESS_ONE_SOUND ":/sounds/chessone.wav"
@@ -46,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
     buttonFont.setBold(true);
     // 执棋方
     QLabel *chessLabel = new QLabel("执棋方：", this);
+    chessLabel->setAttribute(Qt::WA_DeleteOnClose);
     chessLabel->setFont(labelFont);
     chessLabel->setGeometry(size().width() - 175, 100, 200, 50);
 
@@ -74,46 +76,52 @@ MainWindow::~MainWindow()
         delete game;
         game = nullptr;
     }
+    if(startButton){
+        delete startButton;
+        startButton = nullptr;
+    }
+    if(restartButton){
+        delete restartButton;
+        restartButton = nullptr;
+    }
+    if(exitButton){
+        delete exitButton;
+        exitButton = nullptr;
+    }
+
 }
 
 
 void MainWindow::showRandom(){
-    int N1 = 1 + rand() % 9;
-    int N2 = 1 + rand() % 9;
+    DiceWindow *diceWindow = new DiceWindow();
+    diceWindow->setWindowTitle("Who's first");
+    diceWindow->setAttribute(Qt::WA_DeleteOnClose);
+
+    int N1, N2;
+    N1 = 1 + rand() % 6;
+    N2 = 1 + rand() % 6;
     while(N2 == N1){
-        N2 = 1 + rand() % 9;
-    }
-    QFont numFont;
-    numFont.setPointSize(12);
-    numFont.setBold(true);
-    QString random_num1 = QString::number(N1);
-    QString random_num2 = QString::number(N2);
-    int answer;
-    if(N1 < N2){
-        answer = QMessageBox::warning(NULL,
-                                          QString::fromUtf8("数字大的先走"),
-                                          random_num1 + '\n' + random_num2 + '\n' + "白子执棋！",
-                                          QMessageBox::Ok);
-    }
-    else{
-        answer = QMessageBox::warning(NULL,
-                                          QString::fromUtf8("数字大的先走"),
-                                          random_num1 + '\n' + random_num2 + '\n' + "黑子执棋！",
-                                          QMessageBox::Ok);
+        N2 = 1 + rand() % 6;
     }
 
-    if(answer == QMessageBox::Ok){
-        game->startGame(game_type);
+    diceWindow->setNum(N1, N2);
+    diceWindow->setModal(true);
+
+    int ret = diceWindow->exec();
+    if(ret == QDialog::Accepted){
+        game = new GameModel;
+        game_type = PVP;
         game->gameStatus = PLAYING;
-        if(N1 < N2)  game->playerFlag = true;    // 白子大，白子先走
-        else    game->playerFlag = false;   // 黑子大，黑子先走
+        game->startGame(game_type);
+        if(N1 < N2){
+            game->playerFlag = true;    // 白子大，白子先走
+        }
+        else{
+            game->playerFlag = false;   // 黑子大，黑子先走
+        }
     }
 }
-/*
-void MainWindow::initGame(){
-    game = new GameModel;
-    initPVPGame();
-}*/
+
 
 void MainWindow::initPVPGame(){
     game = new GameModel;
@@ -149,6 +157,7 @@ void MainWindow::showTimeLimit(){
     pe.setColor(QPalette::WindowText, Qt::red);
 
     QLabel *timeLabel = new QLabel(this);
+    timeLabel->setAttribute(Qt::WA_DeleteOnClose);
     timeLabel->setGeometry(size().width() - 120, size().height() - 300, 100, 50);
     timeLabel->setFont(font);
     timeLabel->setPalette(pe);
